@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentSaldoElement = document.getElementById('currentSaldo');
     const lastPaymentElement = document.getElementById('lastPayment');
     const todayDateBtn = document.getElementById('todayDate');
+    const ibanInput = document.getElementById('iban'); // Input-Feld für IBAN
 
     function setSaldoColor() {
         const currentSaldoText = currentSaldoElement.textContent.replace(",", ".").replace(" €", "");
@@ -33,23 +34,30 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('date').value = formattedDate;
     }
 
-    // Lade gespeicherte Transaktionen und Saldo aus dem localStorage
+    // Lade gespeicherte Transaktionen, Saldo und IBAN aus dem localStorage
     let savedTransactions = JSON.parse(localStorage.getItem('transactions')) || [];
     let savedSaldo = parseFloat(localStorage.getItem('saldo')) || 1500.00;
     let savedLastPayment = localStorage.getItem('lastPayment') || 'Keine letzten Zahlungen';
+    let savedIBAN = localStorage.getItem('iban') || 'XXXXXXXXXXXXXXXXXXXX'; // Default-IBAN
 
+    // Funktion zum Update des localStorage
     function updateLocalStorage() {
         localStorage.setItem('transactions', JSON.stringify(savedTransactions));
         localStorage.setItem('saldo', savedSaldo.toFixed(2));
         localStorage.setItem('lastPayment', savedLastPayment);
+        localStorage.setItem('iban', savedIBAN);
     }
 
+    // Funktion zum Update der UI (Saldo und letzte Zahlung)
     function updateUI() {
         currentSaldoElement.textContent = savedSaldo.toFixed(2).replace(".", ",") + " €";
         lastPaymentElement.textContent = savedLastPayment;
         setSaldoColor();
+        // Setze den aktuellen IBAN-Wert ins Input-Feld
+        ibanInput.value = maskIBAN(savedIBAN); // IBAN wird maskiert dargestellt
     }
 
+    // Funktion zum Aktualisieren der Transaktionstabelle
     function refreshTable() {
         // Clear table rows
         transactionsTable.innerHTML = '';
@@ -86,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Funktion zum Hinzufügen einer Transaktion zur Tabelle
     function addTransactionToTable(newTransaction) {
         const newRow = transactionsTable.insertRow();
         const dateCell = newRow.insertCell(0);
@@ -115,18 +124,21 @@ document.addEventListener('DOMContentLoaded', function() {
         saldoAfterCell.textContent = newTransaction.saldoAfter.toFixed(2).replace(".", ",") + " €";
     }
 
-    // Initialisierung
+    // Initialisierung der Seite
     updateUI();
     refreshTable();
 
+    // Event Listener für das Öffnen des Transaktions-Popups
     addTransactionBtn.addEventListener('click', () => {
         transactionPopup.style.display = 'block';
     });
 
+    // Event Listener für das Schließen des Transaktions-Popups
     closeBtn.addEventListener('click', () => {
         transactionPopup.style.display = 'none';
     });
 
+    // Event Listener für die Kategorien-Auswahl-Buttons
     categoryButtons.forEach(button => {
         button.addEventListener('click', () => {
             categoryButtons.forEach(btn => btn.classList.remove('active'));
@@ -135,13 +147,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Eventlistener für den "Heute"-Button
+    // Event Listener für den "Heute"-Button
     todayDateBtn.addEventListener('click', setCurrentDate);
 
-    // Eventlistener für die Formularübermittlung
+    // Event Listener für die Formularübermittlung (Transaktion hinzufügen)
     transactionForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
+        // Daten aus dem Formular holen
         const date = document.getElementById('date').value;
         const description = document.getElementById('description').value;
         const amount = parseFloat(document.getElementById('amount').value);
@@ -149,6 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const status = document.getElementById('status').value;
         const paymentProvider = document.getElementById('searchInput').value;
 
+        // Saldo vor und nach der Transaktion berechnen
         const saldoBefore = savedSaldo;
         const newTransaction = {
             date: date,
@@ -161,15 +175,23 @@ document.addEventListener('DOMContentLoaded', function() {
             saldoAfter: saldoBefore + amount
         };
 
-        // Transaktion zum localStorage hinzufügen
+        // Transaktion zum Array hinzufügen und Saldo aktualisieren
         savedTransactions.push(newTransaction);
         savedSaldo += amount;
         savedLastPayment = `${description}: ${amount.toFixed(2).replace(".", ",")} €`;
 
+        // Beispiel für IBAN-Speicherung mit Maskierung
+        const iban = 'DE89370400440532013000'; // Beispiel-IBAN, hier anpassen für echte IBAN
+        const maskedIBAN = 'XXXXXX' + iban.substring(iban.length - 3); // Maskierung
+
+        savedIBAN = maskedIBAN;
+
+        // Update des localStorage, UI und Tabelle
         updateLocalStorage();
         updateUI();
         addTransactionToTable(newTransaction);
 
+        // Formular und UI zurücksetzen
         transactionPopup.style.display = 'none';
         transactionForm.reset();
         categoryButtons.forEach(btn => btn.classList.remove('active'));
@@ -186,6 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setSaldoColor();
 });
 
+// Array mit Zahlungsdienstleistern
 var paymentProviders = [
     "Keiner",
     "PayPal",
@@ -204,7 +227,7 @@ var paymentProviders = [
     "Klarna"
 ];
 
-// Funktion für die Suche
+// Funktion für die Suche nach Zahlungsdienstleistern
 function searchFunction() {
     var input, filter, ul, li, i, txtValue;
     input = document.getElementById("searchInput");
@@ -212,16 +235,23 @@ function searchFunction() {
     ul = document.getElementById("searchResults");
     ul.innerHTML = '';
 
+    // Durchsuche das Array nach Übereinstimmungen und füge gefundene Einträge zur Liste hinzu
     for (i = 0; i < paymentProviders.length; i++) {
         txtValue = paymentProviders[i];
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
             li = document.createElement('li');
             li.textContent = txtValue;
             li.addEventListener('click', function() {
-                input.value = this.textContent; // Hier ändern
-                ul.innerHTML = '';
+                input.value = this.textContent; // Setze den Wert ins Suchfeld
+                ul.innerHTML = ''; // Leere die Ergebnisliste
             });
             ul.appendChild(li);
         }
     }
+}
+
+// Funktion zur Maskierung der IBAN
+function maskIBAN(iban) {
+    const maskedPart = 'XXXXXX' + iban.substring(iban.length - 3);
+    return maskedPart;
 }
