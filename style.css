@@ -1,0 +1,307 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+
+nav {
+    background-color: #cecdcd;
+    padding: 1rem;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+nav ul li {
+    margin: 0;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+}
+
+main {
+    padding: 1rem;
+}
+
+.card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 0.5rem;
+    text-align: left;
+}
+
+th {
+    background-color: #f0f0f0;
+}
+
+footer {
+    background-color: #007bff;
+    color: #fff;
+    text-align: center;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Popup Styles */
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.popup-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: 0.5rem;
+}
+
+input, select, button {
+    margin-top: 0.5rem;
+}
+
+/* Category Scrollbar */
+#categoryContainer {
+    display: flex;
+    overflow-x: auto;
+    margin-top: 0.5rem;
+}
+
+.categoryBtn {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+    flex: 0 0 auto;
+    cursor: pointer;
+}
+
+.categoryBtn:hover {
+    background-color: #ddd;
+}
+
+.categoryBtn.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+#saldo {
+    font-size: 35px;
+    border: solid 1px;
+    border-radius: 7px;
+}
+
+#saldo:hover {
+    animation: scaleUpDown 0.5s ease-in-out infinite;
+}
+
+input {
+    padding: 10px;
+    font-size: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+select {
+    padding: 10px;
+    font-size: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+input:focus {
+    outline: none;
+}
+
+@keyframes scaleUpDown {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.01);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+#setSaldoBtn {
+    padding: 10px;
+    font-size: 25px;
+}
+
+#saveSettings {
+    display: flex;
+    margin-left: 40%;
+    padding: 10px;
+    font-size: 25px;
+}
+
+#accountSaldo {
+    margin-left: 10px;
+}
+
+.search-container input[type=text] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.search-results li {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    list-style-type: none;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: left;
+}
+
+.search-results li:hover {
+    background-color: #f1f1f1;
+}
+
+#euroSign {
+    scale: 2;
+    vertical-align: 6px;
+    margin-left: 10px;
+}
+
+.tooltip {
+    position: absolute;
+    background-color: #d8d8d8;
+    color: #000000;
+    padding: 5px;
+    margin: 10px;
+    border-radius: 5px;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.tooltip.show {
+    opacity: 1;
+}
+
+
+#infoSaldo {
+    scale: 0.8;
+}
+
+.hidden {
+    display: none;
+}
+
+.error {
+    margin-top: 10px;
+    color: #ff0000;
+    animation: shake 0.3s infinite;
+}
+
+#errorMessage {
+    margin-top: 10px;
+    color: #ff0000;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+
+#currentSaldo {
+    font-weight: bold;
+    font-size: 30px;
+}
+
+#lastPayment {
+    font-weight: bold;
+    font-size: 30px;
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banking App Übersicht</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <header>
+        <h1>Banking App</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="index.html">Übersicht</a></li>
+            <li><a href="profile.html">Profileinstellungen</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section id="overview">
+            <h2>Übersicht</h2>
+            <div class="card">
+                <h3>Kontostand</h3>
+                <p id="currentSaldo"></p>
+            </div>
+            <div class="card">
+                <h3>Letzte Zahlung</h3>
+                <p id="lastPayment">Keine letzten Zahlungen</p>
+            </div>
+        </section>
+        <section id="transactions">
+            <h2>Transaktionen</h2>
+            <button id="addTransactionBtn">Transaktion hinzufügen</button>
+            <table id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th>Datum <i class="fa-solid fa-arrow-up"></i> 
+                                  <i class="fa-solid fa-arrow-down"></i></th>
+                        <th>Beschreibung <i class="fa-solid fa-arrow-up"></i> 
+                            <i class="fa-solid fa-arrow-down"></i></th>
+                        <th>Betrag <i class="fa-solid fa-arrow-up"></i> 
+                            <i class="fa-solid fa-arrow-down"></i></th>
+                        <th>Kategorie <i class="fa-solid fa-arrow-up"></i> 
+                            <i class="fa-solid fa-arrow-down"></i></th>
+                        <th>Status <i class="fa-solid fa-arrow-up"></i> 
+                            <i class="fa-solid fa-arrow-down"></i></th>
+                        <th>Zahlungsanbieter <i class="fa-solid fa-arrow-up"></i> 
+                            <i class="fa-solid fa-arrow-down"></i></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Banking App</p>
+    </footer>
+
+    <!-- Popup für neue Transaktion -->
+    <div id="transactionPopup" class="popup">
+        <div class="popup-content">
+            <span class="close">&times;</span>
+            <h2>Neue Transaktion hinzufügen</h2>
+            <form id="transactionForm">
+                <label for="date">Datum:</label>
+                <input type="date" id="date" name="date" required>
+                <button id="todayDate">Heute</button>
+                <label for="description">Beschreibung:</label>
+                <input type="text" id="description" name="description" required>
+                <label for="amount">Betrag<i class="fa-regular fa-circle-question" id="infoBetrag"></i>:</label>
+                <input type="number" step="0.01" id="amount" name="amount" required>
+                <label for="category">Kategorie:</label>
+                <div id="categoryContainer" required>
+                    <button type="button" class="categoryBtn" data-category="Lebensmittel">Lebensmittel</button>
+                    <button type="button" class="categoryBtn" data-category="Transport">Transport</button>
+                    <button type="button" class="categoryBtn" data-category="Freizeit">Freizeit</button>
+                    <button type="button" class="categoryBtn" data-category="Gesundheit">Gesundheit</button>
+                    <button type="button" class="categoryBtn" data-category="Miete">Miete</button>
+                    <button type="button" class="categoryBtn" data-category="Online">Online</button>
+                    <button type="button" class="categoryBtn" data-category="Sonstiges">Sonstiges</button>
+                </div>
+                <div class="search-container">
+                    <input type="text" id="searchInput" onkeyup="searchFunction()" placeholder="Suche nach Zahlungsanbietern..." required>
+                    <ul id="searchResults" class="search-results">
+                    </ul>
+                </div>
+                <label for="status">Status:</label>
+                <select id="status" name="status" required>
+                    <option value="Bezahlt">Bezahlt</option>
+                    <option value="Ausstehend">Ausstehend</option>
+                    <option value="Offen">Offen</option>
+                </select>
+                <input type="hidden" id="selectedCategory" name="selectedCategory" required>
+                <button type="submit">Hinzufügen</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
