@@ -34,14 +34,59 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Lade gespeicherte Transaktionen und Saldo aus dem localStorage
-    const savedTransactions = JSON.parse(localStorage.getItem('transactions')) || [];
-    const savedSaldo = parseFloat(localStorage.getItem('saldo')) || 1500.00;
-    const savedLastPayment = localStorage.getItem('lastPayment') || 'Keine letzten Zahlungen';
+    let savedTransactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    let savedSaldo = parseFloat(localStorage.getItem('saldo')) || 1500.00;
+    let savedLastPayment = localStorage.getItem('lastPayment') || 'Keine letzten Zahlungen';
 
-    currentSaldoElement.textContent = savedSaldo.toFixed(2).replace(".", ",") + " €";
-    lastPaymentElement.textContent = savedLastPayment;
+    function updateLocalStorage() {
+        localStorage.setItem('transactions', JSON.stringify(savedTransactions));
+        localStorage.setItem('saldo', savedSaldo.toFixed(2));
+        localStorage.setItem('lastPayment', savedLastPayment);
+    }
 
-    savedTransactions.forEach(transaction => {
+    function updateUI() {
+        currentSaldoElement.textContent = savedSaldo.toFixed(2).replace(".", ",") + " €";
+        lastPaymentElement.textContent = savedLastPayment;
+        setSaldoColor();
+    }
+
+    function refreshTable() {
+        // Clear table rows
+        transactionsTable.innerHTML = '';
+
+        // Re-render all transactions
+        savedTransactions.forEach(transaction => {
+            const newRow = transactionsTable.insertRow();
+            const dateCell = newRow.insertCell(0);
+            const descriptionCell = newRow.insertCell(1);
+            const amountCell = newRow.insertCell(2);
+            const categoryCell = newRow.insertCell(3);
+            const statusCell = newRow.insertCell(4);
+            const paymentProviderCell = newRow.insertCell(5);
+            const saldoBeforeCell = newRow.insertCell(6);
+            const saldoAfterCell = newRow.insertCell(7);
+
+            dateCell.textContent = transaction.date;
+            descriptionCell.textContent = transaction.description;
+            amountCell.textContent = `${transaction.amount} €`;
+
+            // Setze Farbe basierend auf dem Transaktionstyp
+            if (parseFloat(transaction.amount) >= 0) {
+                amountCell.style.color = 'green';
+            } else {
+                amountCell.style.color = 'red';
+            }
+
+            categoryCell.textContent = transaction.category;
+            statusCell.textContent = transaction.status;
+            paymentProviderCell.textContent = transaction.paymentProvider;
+
+            saldoBeforeCell.textContent = transaction.saldoBefore.toFixed(2).replace(".", ",") + " €";
+            saldoAfterCell.textContent = transaction.saldoAfter.toFixed(2).replace(".", ",") + " €";
+        });
+    }
+
+    function addTransactionToTable(newTransaction) {
         const newRow = transactionsTable.insertRow();
         const dateCell = newRow.insertCell(0);
         const descriptionCell = newRow.insertCell(1);
@@ -49,22 +94,30 @@ document.addEventListener('DOMContentLoaded', function() {
         const categoryCell = newRow.insertCell(3);
         const statusCell = newRow.insertCell(4);
         const paymentProviderCell = newRow.insertCell(5);
+        const saldoBeforeCell = newRow.insertCell(6);
+        const saldoAfterCell = newRow.insertCell(7);
 
-        dateCell.textContent = transaction.date;
-        descriptionCell.textContent = transaction.description;
-        amountCell.textContent = `${transaction.amount} €`;
+        dateCell.textContent = newTransaction.date;
+        descriptionCell.textContent = newTransaction.description;
+        amountCell.textContent = `${newTransaction.amount} €`;
 
         // Setze Farbe basierend auf dem Transaktionstyp
-        if (parseFloat(transaction.amount) >= 0) {
+        if (parseFloat(newTransaction.amount) >= 0) {
             amountCell.style.color = 'green';
         } else {
             amountCell.style.color = 'red';
         }
 
-        categoryCell.textContent = transaction.category;
-        statusCell.textContent = transaction.status;
-        paymentProviderCell.textContent = transaction.paymentProvider;
-    });
+        categoryCell.textContent = newTransaction.category;
+        statusCell.textContent = newTransaction.status;
+        paymentProviderCell.textContent = newTransaction.paymentProvider;
+        saldoBeforeCell.textContent = newTransaction.saldoBefore.toFixed(2).replace(".", ",") + " €";
+        saldoAfterCell.textContent = newTransaction.saldoAfter.toFixed(2).replace(".", ",") + " €";
+    }
+
+    // Initialisierung
+    updateUI();
+    refreshTable();
 
     addTransactionBtn.addEventListener('click', () => {
         transactionPopup.style.display = 'block';
@@ -91,46 +144,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const date = document.getElementById('date').value;
         const description = document.getElementById('description').value;
-        const amount = parseFloat(document.getElementById('amount').value).toFixed(2);
+        const amount = parseFloat(document.getElementById('amount').value);
         const category = document.getElementById('selectedCategory').value;
         const status = document.getElementById('status').value;
-        const paymentProvider = document.getElementById('searchInput').value; 
+        const paymentProvider = document.getElementById('searchInput').value;
 
+        const saldoBefore = savedSaldo;
         const newTransaction = {
             date: date,
             description: description,
-            amount: amount,
+            amount: amount.toFixed(2),
             category: category,
             status: status,
-            paymentProvider: paymentProvider 
+            paymentProvider: paymentProvider,
+            saldoBefore: saldoBefore,
+            saldoAfter: saldoBefore + amount
         };
 
         // Transaktion zum localStorage hinzufügen
         savedTransactions.push(newTransaction);
-        localStorage.setItem('transactions', JSON.stringify(savedTransactions));
+        savedSaldo += amount;
+        savedLastPayment = `${description}: ${amount.toFixed(2).replace(".", ",")} €`;
 
-        const newRow = transactionsTable.insertRow();
-        const dateCell = newRow.insertCell(0);
-        const descriptionCell = newRow.insertCell(1);
-        const amountCell = newRow.insertCell(2);
-        const categoryCell = newRow.insertCell(3);
-        const statusCell = newRow.insertCell(4);
-        const paymentProviderCell = newRow.insertCell(5); 
-
-        dateCell.textContent = date;
-        descriptionCell.textContent = description;
-        amountCell.textContent = `${amount} €`;
-
-        // Farbe basierend auf Transaktionstyp setzen
-        if (parseFloat(amount) >= 0) {
-            amountCell.style.color = 'green';
-        } else {
-            amountCell.style.color = 'red';
-        }
-
-        categoryCell.textContent = category;
-        statusCell.textContent = status;
-        paymentProviderCell.textContent = paymentProvider;
+        updateLocalStorage();
+        updateUI();
+        addTransactionToTable(newTransaction);
 
         transactionPopup.style.display = 'none';
         transactionForm.reset();
@@ -138,14 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedCategoryInput.value = '';
 
         // Letzte Zahlung aktualisieren
-        lastPaymentElement.textContent = `${description}: ${amount} €`;
-        localStorage.setItem('lastPayment', lastPaymentElement.textContent);
-
-        // Aktuellen Saldo aktualisieren
-        let currentSaldo = parseFloat(currentSaldoElement.textContent.replace(/[^0-9,-]+/g,"").replace(",", "."));
-        currentSaldo += parseFloat(amount);
-        currentSaldoElement.textContent = currentSaldo.toFixed(2).replace(".", ",") + " €";
-        localStorage.setItem('saldo', currentSaldo);
+        lastPaymentElement.textContent = savedLastPayment;
 
         // Saldo-Farbe aktualisieren
         setSaldoColor();
@@ -194,158 +225,3 @@ function searchFunction() {
         }
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    const setSaldoBtn = document.getElementById('setSaldoBtn');
-    const saldoInput = document.getElementById('saldo');
-    const confirmPopup = document.getElementById('confirmPopup');
-    const confirmBtn = document.getElementById('confirmBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const confirmInfo = document.getElementById('confirmInfo');
-    const close = document.getElementById('close');
-    const confirmText = document.getElementById('confirmText');
-    const errorMessage = document.getElementById('errorMessage');
-
-    setSaldoBtn.addEventListener('click', () => {
-        confirmInfo.textContent = `Möchten Sie den Kontostand auf ${saldoInput.value} € setzen? Alle Transaktionen werden aus dem Speicher entfernt!`;
-        confirmPopup.style.display = 'block';
-    });
-
-    cancelBtn.addEventListener('click', () => {
-        confirmPopup.style.display = 'none';
-    });
-
-    close.addEventListener('click', () => {
-        confirmPopup.style.display = 'none';
-    });
-
-    confirmBtn.addEventListener('click', () => {
-        const confirmInput = confirmText.value.trim();
-
-        if (confirmInput === "BESTÄTIGEN") {
-            const newSaldo = parseFloat(saldoInput.value);
-            confirmPopup.style.display = 'none';
-            if (!isNaN(newSaldo)) {
-                localStorage.removeItem('transactions');
-                localStorage.removeItem('lastPayment');
-                localStorage.setItem('saldo', newSaldo);
-                currentSaldoElement.textContent = newSaldo.toFixed(2).replace(".", ",") + " €";
-                setSaldoColor();
-            }
-
-        } else {
-            errorMessage.classList.remove('hidden');
-            errorMessage.classList.add('error');
-            setTimeout(function() {
-                errorMessage.classList.remove('error');
-            }, 1000); 
-        }
-    });
-});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-
-    const saveSettingsBtn = document.getElementById('saveSettings');
-
-    saveSettingsBtn.addEventListener('click', () => {
-        window.location.href = 'index.html';
-    });
-});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    const infoSaldo = document.getElementById('infoSaldo');
-    let tooltip = null;
-
-    infoSaldo.addEventListener('mouseover', (event) => {
-        const tooltipText = 'Hiermit können Sie das Startsaldo des Kontos festlegen. Das Ändern des Saldos führt zur Löschung der Transaktionen im Zusammenhang mit dem vorherigen Saldo.';
-        if (!tooltip) {
-            tooltip = createTooltip(tooltipText);
-        }
-        positionTooltip(event.pageX, event.pageY);
-        tooltip.classList.add('show');
-    });
-
-    infoSaldo.addEventListener('mouseout', () => {
-        if (tooltip) {
-            tooltip.classList.remove('show');
-            setTimeout(() => {
-                if (tooltip) {
-                    tooltip.parentNode.removeChild(tooltip);
-                    tooltip = null;
-                }
-            }, 300);
-        }
-    });
-    
-
-    function createTooltip(text) {
-        const newTooltip = document.createElement('div');
-        newTooltip.textContent = text;
-        newTooltip.classList.add('tooltip');
-        document.body.appendChild(newTooltip);
-        return newTooltip;
-    }
-
-    function positionTooltip(mouseX, mouseY) {
-        if (tooltip) {
-            tooltip.style.top = mouseY + 'px';
-            tooltip.style.left = mouseX + 'px';
-        }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const infoBetrag = document.getElementById('infoBetrag');
-    let tooltip = null;
-
-    infoBetrag.addEventListener('mouseover', (event) => {
-        const tooltipText = 'Eingaben ohne "-" werden automatisch zum Saldo addiert, Eingaben mit "-" subtrahieren vom Saldo.';
-        if (!tooltip) {
-            tooltip = createTooltip(tooltipText);
-        }
-        positionTooltip(event.pageX, event.pageY);
-        tooltip.classList.add('show');
-    });
-
-    infoBetrag.addEventListener('mouseout', () => {
-        if (tooltip) {
-            tooltip.classList.remove('show');
-            setTimeout(() => {
-                if (tooltip) {
-                    tooltip.parentNode.removeChild(tooltip);
-                    tooltip = null;
-                }
-            }, 300);
-        }
-    });
-    
-
-    function createTooltip(text) {
-        const newTooltip = document.createElement('div');
-        newTooltip.textContent = text;
-        newTooltip.classList.add('tooltip');
-        document.body.appendChild(newTooltip);
-        return newTooltip;
-    }
-
-    function positionTooltip(mouseX, mouseY) {
-        if (tooltip) {
-            tooltip.style.top = mouseY + 'px';
-            tooltip.style.left = mouseX + 'px';
-        }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const currentSaldo = document.getElementById('currentSaldo');
-    const currentSaldoText = currentSaldo.textContent.replace(",", ".").replace(" €", "");
-    const currentSaldoInt = parseFloat(currentSaldoText);
-
-    if (currentSaldoInt >= 0) {
-        currentSaldo.style.color = "green";
-    } else {
-        currentSaldo.style.color = "red";
-    }
-});

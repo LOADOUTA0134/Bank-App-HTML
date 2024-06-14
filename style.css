@@ -178,6 +178,16 @@ input, select, button {
     animation: scaleUpDown 0.5s ease-in-out infinite;
 }
 
+#iban {
+    font-size: 35px;
+    border: solid 1px;
+    border-radius: 7px;
+}
+
+#iban:hover {
+    animation: scaleUpDown 0.5s ease-in-out infinite;
+}
+
 input {
     padding: 10px;
     font-size: 15px;
@@ -270,7 +280,7 @@ input:focus {
 }
 
 
-#infoSaldo {
+i {
     scale: 0.8;
 }
 
@@ -304,4 +314,13 @@ input:focus {
 #lastPayment {
     font-weight: bold;
     font-size: 30px;
+}
+
+#accountIban {
+    margin-left: 10px;
+}
+
+#setIbanBtn {
+    padding: 10px;
+    font-size: 25px;
 }
